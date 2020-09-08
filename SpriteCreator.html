@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sprite Creator</title>
+    <style>
+      * {
+        background-color: #555555;
+      }
+      input {
+        background-color: #999999;
+        border: solid 3px #cccccc;
+        border-radius: 3px;
+        padding: 2px;
+        margin: 5px;
+        font-family: Arial;
+        color: #ededed;
+      }
+      select {
+        background-color: #999999;
+        border: solid 3px #cccccc;
+        border-radius: 3px;
+        padding: 2px;
+        margin: 5px;
+        font-family: Arial;
+        color: #ededed;
+      }
+      label {
+        font-family: Arial;
+        color: #ededed;
+      }
+      canvas {
+        border: solid 3px #cccccc;
+        border-radius: 3px;
+        background-color: white;
+      }
+      .color-button {
+        width: 25px;
+        height: 25px;
+        border: solid #cccccc 1px;
+        border-radius: 5px;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        font-family: Arial;
+      }
+      .selected-color-button {
+        width: 25px;
+        height: 25px;
+        border: solid red 3px;
+        border-radius: 5px;
+      }
+      .save-button {
+        border: solid #99e699 3px;
+        border-radius: 3px;
+        background-color: #33cc33;
+        font-family: Arial;
+        color: #ededed;
+        width: 150px;
+      }
+      .save-button:active {
+        border: solid #47d147 3px;
+        background-color: #29a329;
+      }
+      .clear-button {
+        border: solid #ff4d4d 3px;
+        border-radius: 3px;
+        background-color: #cc0000;
+        font-family: Arial;
+        color: #ededed;
+        width: 150px;
+      }
+      .clear-button:active {
+        border: solid #e60000 3px;
+        background-color: #990000;
+      }
+      .load-button {
+        border: solid #80b3ff 3px;
+        border-radius: 3px;
+        background-color: #0066ff;
+        font-family: Arial;
+        color: #ededed;
+        width: 150px;
+      }
+      .load-button:active {
+        border: solid #1a75ff 3px;
+        background-color: #0052cc;
+      }
+      .frame-preview {
+        width: 50px;
+        height: 50px;
+        border: none;
+      }
+      .frame-preview-selected {
+        width: 50px;
+        height: 50px;
+        border: 2px solid blue;
+      }
+      div.noSelect {
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+      }
+      div {
+        display: inline-block;
+        padding-left: 25px;
+        padding-right: 25px;
+        vertical-align: top;
+      }
+      .swap-input {
+        width: 50px;
+      }
+      button {
+        color: #ededed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class = "noSelect">
+      <label for = "spriteName">Sprite Name:</label>
+      <input type = "text" min = "1" id = "spriteName" value = "newSprite"/>
+      <br>
+      <label for = "spriteWidth">Sprite Width:</label>
+      <input type = "number" min = "1" max = "255" id = "spriteWidth" onChange = "updateSpriteWidth();" value = "1"/>
+      <br>
+      <label for = "spriteWidth">Sprite Height:</label>
+      <input type = "number" min = "1" max = "255" id = "spriteHeight" onChange = "updateSpriteHeight();" value = "1"/>
+      <br>
+      <label for = "pixelSize">Pixel Size:</label>
+      <input type = "number" min = "1" id = "pixelSize" onChange = "updatePixelSize();" value = "20"/>
+
+      <br><br><br>
+
+      <label for = "palette">Palette:</label>
+      <select id = "palette" onChange = "updatePalette();">
+        <option value = "basic">Basic</option>
+      </select>
+      <br>
+      <label for = "paletteFile">Load palette:</label>
+      <input type = "file" id = "paletteFile"></input>
+      <br>
+      <label for = "spriteFile">Load sprite:</label>
+      <input type = "file" id = "spriteFile"></input>
+      <br>
+      <label for = "spriteFileLegacy">Legacy load sprite:</label>
+      <input type = "file" id = "spriteFileLegacy"></input>
+      <br>
+      <div id = "colorButtons">
+        <button class = "selected-color-button" id = "0" onClick = "changeColor(0);">0</button>
+        <button class = "color-button" id = "1" onClick = "changeColor(1);">1</button>
+        <button class = "color-button" id = "2" onClick = "changeColor(2);">2</button>
+        <button class = "color-button" id = "3" onClick = "changeColor(3);">3</button>
+        <button class = "color-button" id = "4" onClick = "changeColor(4);">4</button>
+        <button class = "color-button" id = "5" onClick = "changeColor(5);">5</button>
+        <button class = "color-button" id = "6" onClick = "changeColor(6);">6</button>
+        <button class = "color-button" id = "7" onClick = "changeColor(7);">7</button>
+        <br>
+        <button class = "color-button" id = "8" onClick = "changeColor(8);">8</button>
+        <button class = "color-button" id = "9" onClick = "changeColor(9);">9</button>
+        <button class = "color-button" id = "A" onClick = "changeColor(0xA);">A</button>
+        <button class = "color-button" id = "B" onClick = "changeColor(0xB);">B</button>
+        <button class = "color-button" id = "C" onClick = "changeColor(0xC);">C</button>
+        <button class = "color-button" id = "D" onClick = "changeColor(0xD);">D</button>
+        <button class = "color-button" id = "E" onClick = "changeColor(0xE);">E</button>
+        <button class = "color-button" id = "F" onClick = "changeColor(0xF);">F</button>
+      </div>
+
+      <br><br><br>
+
+      <button class = "save-button" onClick = "save();">SAVE</button>
+      <button class = "clear-button" onClick = "clearPixelGrid(); drawCanvas(); updateCurrentFramePreview();">CLEAR</button>
+
+      <br><br><br>
+
+      <label for = "grid">Grid</label>
+      <input type = "checkbox" id = "grid" onClick = "toggleGrid();" checked>
+      <label for = "mirrorx">Mirror x-axis</label>
+      <input type = "checkbox" id = "mirrorx" onClick = "toggleMirror(false);" >
+      <label for = "mirrorx">Mirror y-axis</label>
+      <input type = "checkbox" id = "mirrory" onClick = "toggleMirror(true);">
+      <label for = "tempModeBox">Select pixels</label>
+      <input type = "checkbox" onclick = "updateTempMode();" id = "tempModeBox"></input>
+
+      <br><br><br>
+
+      <button onclick = "addFrame();">ADD FRAME</button>
+      <button onclick = "deleteFrame();">DELETE FRAME</button>
+      <button onclick = "flipX();">Flip X</button>
+      <button onclick = "flipY();">Flip Y</button>
+      <br>
+      <label for = "swapLeft">Move frame #</label>
+      <input type = "text" id = "swapLeft" class = "swap-input"></input>
+      <label for = "swapRight">after frame #</label>
+      <input type = "text" id = "swapRight" class = "swap-input"></input>
+      <button onclick = "swapFrames();">SWAP</button>
+      <br>
+      <label for = "timePerFrame">Time Per Frame (ms):</label>
+      <input type = "number" min = "1" max = "65535" id = "timePerFrame" value = 200></input>
+      <br>
+      <button onclick = "playOrPause();">Play/Pause</button>
+      <br>
+      <button onclick = "window.open('./SpriteCreator.html', '_blank');">New Tab</button>
+    </div>
+
+
+    <div>
+      <canvas id = "c"></canvas>
+      <br>
+      <label for = "backgroundColor">Background color:</label>
+      <input type = "color" id = "backgroundColor" value = "#ffffff" onchange = "updateBackgroundColor();"></input>
+    </div>
+
+    <br><br>
+
+    <div id = "frames">
+    </div>
+
+    <script>
+      let c = document.getElementById("c");
+      let ctx = c.getContext("2d");
+      let spriteWidth = 1, spriteHeight = 1;
+      let pixelSize = 20;
+      let PREVIEW_SCALE = 50;
+      let PIXELS_PER_SIDE = 16;
+      let COLOR_CLEAR = 0x10;
+      let SELECTED_BORDER_STYLE = "solid red 3px";
+      let UNSELECTED_BORDER_STYLE = "solid #cccccc 1px";
+      let grid = new Image(), drawGrid = true, mirrorX = false, mirrorY = false;
+      let bgcolor = "#ffffff";
+
+
+      let tempLayer = [[]];
+      let tempSelectColor = "#00ff00", tempSelectAlpha = .25;
+      let selectedPixels = [];
+      let tempMode = false, selecting = false;
+      function updateTempMode(){
+        tempMode = document.getElementById("tempModeBox").checked;
+        if(!tempMode){
+          mergeTempLayer();
+          clearTempLayer();
+          drawCanvas();
+        }
+        else{
+          selecting = true;
+        }
+      }
+      function drawTempLayer(){
+        for(var i = 0; i < spriteHeight * PIXELS_PER_SIDE; i++){
+          for(var j = 0; j < spriteWidth * PIXELS_PER_SIDE; j++){
+            if(tempLayer[i][j] !== COLOR_CLEAR){
+              if(selecting)
+                rect(j * pixelSize, i * pixelSize, pixelSize, pixelSize, tempSelectColor, tempSelectAlpha);
+              else
+                drawPixel(j, i, true);
+            }
+          }
+        }
+      }
+      function clearTempLayer(){
+        tempLayer = new Array(spriteHeight * PIXELS_PER_SIDE);
+        for(var i = 0; i < tempLayer.length; i++)
+          tempLayer[i] = new Array(spriteWidth * PIXELS_PER_SIDE).fill(COLOR_CLEAR);
+        selectedPixels = [];
+      }
+      function mergeTempLayer(){
+        let pixelGrid = currentFrame().pixelGrid;
+        selectedPixels.forEach((p) => {
+          pixelGrid[p.y][p.x] = COLOR_CLEAR;
+        });
+        for(var i = 0; i < tempLayer.length; i++)
+          for(var j = 0; j < tempLayer[i].length; j++)
+            if(tempLayer[i][j] !== COLOR_CLEAR)
+              pixelGrid[i][j] = tempLayer[i][j];
+      }
+      function flipX(){
+        let pixelGrid = currentFrame().pixelGrid;
+        for(var i = 0; i < pixelGrid.length; i++){
+          for(var j = 0; j < pixelGrid[i].length / 2; j++){
+            let x = pixelGrid[i].length - 1 - j;
+            let temp = pixelGrid[i][j];
+            pixelGrid[i][j] = pixelGrid[i][x];
+            pixelGrid[i][x] = temp;
+          }
+        }
+        drawCanvas();
+        updateFramePreviews();
+      }
+      function flipY(){
+        let pixelGrid = currentFrame().pixelGrid;
+        for(var i = 0; i < pixelGrid.length / 2; i++){
+          let y = pixelGrid.length - 1 - i;
+          let temp = pixelGrid[i];
+          pixelGrid[i] = pixelGrid[y];
+          pixelGrid[y] = temp;
+        }
+        drawCanvas();
+        updateFramePreviews();
+      }
+
+      let mouse = {
+        x: undefined,
+        y: undefined,
+        button: -1
+      };
+      let LMB = 0, MMB = 1, RMB = 2;
+
+      /**
+       *
+       * ADD PALETTES HERE
+       *
+       */
+      let palettes = {
+        "basic": [
+          0x000000,
+          0xffffff,
+          0xaaaaaa,
+          0x555555,
+
+          0xff0000,
+          0x00ff00,
+          0x0000ff,
+          0xffff00,
+
+          0xff00ff,
+          0x00ffff,
+          0x770000,
+          0x007700,
+
+          0x000077,
+          0x777700,
+          0x770077,
+          0x007777
+        ]
+      };
+      let currentPalette = undefined;
+      let currentColor = 0;
+
+      let frames = [{ pixelGrid: [[]], undoStack: [], redoStack: [] }];
+      let frame = 0;
+
+      function init(){
+        document.getElementById("frames").innerHTML = '';
+        document.getElementById("paletteFile").addEventListener('change', loadPalette, false);
+        document.getElementById("spriteFile").addEventListener('change', loadSprite, false);
+        document.getElementById("spriteFileLegacy").addEventListener('change', load, false);
+        addFramePreview(0);
+        changeFrame(0);
+        resizePixelGrid();
+        resizeCanvas();
+        updatePalette();
+      }
+      init();
+
+      function save(){
+        downloadFile();
+        //printPixelGrid();
+      }
+      function downloadFile(){
+        let timePerFrame = parseInt(document.getElementById("timePerFrame").value);
+        let charMax = 0b11111111;
+
+        let index = 0;
+        let data = new Uint8Array(5 + (16 * 3) + (spriteWidth * PIXELS_PER_SIDE * spriteHeight * PIXELS_PER_SIDE * frames.length));
+        data[index++] = spriteWidth;
+        data[index++] = spriteHeight;
+        data[index++] = frames.length;
+        data[index++] = (timePerFrame & (charMax << 8)) >> 8;
+        data[index++] = (timePerFrame & charMax);
+
+        for(var i = 0; i < 16; i++)
+        {
+          let cur = currentPalette[i];
+          data[index++] = (cur & (charMax << 16)) >> 16;
+          data[index++] = (cur & (charMax << 8)) >> 8;
+          data[index++] = (cur & charMax);
+        }
+
+        for(var i = 0; i < frames.length; i++)
+          for(var j = 0; j < spriteHeight * PIXELS_PER_SIDE; j++)
+            for(var k = 0; k < spriteWidth * PIXELS_PER_SIDE; k++)
+              data[index++] = frames[i].pixelGrid[j][k];
+
+        let file = new Blob([data], { type: 'application/octet-stream' });
+        let a = document.createElement("a"), url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = `${document.getElementById("spriteName").value}.sprite`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 0);
+      }
+      function loadSprite(e){
+        if(!confirm('WARNING: Any unsaved progress on the current sprite will be lost. Load anyway?'))
+          return;
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let data = new Uint8Array(e.target.result);
+          let index = 0;
+
+          let width = data[index++];
+          let height = data[index++];
+          let nframes = data[index++];
+          document.getElementById("timePerFrame").value = (data[index++] << 8) | data[index++];
+
+          let temp = new Array(16);
+          for(var i = 0; i < 16; i++)
+          {
+            let red = (data[index++] << 16);
+            let green = (data[index++] << 8);
+            let blue = data[index++];
+            temp[i] = red | green | blue;
+          }
+
+          palettes[file.name] = temp;
+          let option = document.createElement("option");
+          option.value = file.name;
+          option.innerHTML = file.name;
+          document.getElementById("palette").appendChild(option);
+          document.getElementById("palette").value = file.name;
+          updatePalette();
+
+          document.getElementById("spriteName").value = file.name;
+
+          document.getElementById("spriteWidth").value = width;
+          document.getElementById("spriteHeight").value = height;
+          updateSpriteWidth();
+          updateSpriteHeight();
+
+          frames = [];
+          frame = 0;
+          document.getElementById("frames").innerHTML = '';
+          for(var i = 0; i < nframes; i++){
+            let grid = [];
+            for(var j = 0; j < spriteHeight * PIXELS_PER_SIDE; j++)
+              for(var k = 0; k < spriteWidth * PIXELS_PER_SIDE; k++)
+                grid.push(data[index++]);
+            addFrame(createFrameFromBuffer(grid));
+          }
+
+          document.getElementById("palette").value = file.name;
+          document.getElementById("spriteFile").value = "";
+          updatePalette();
+        };
+        reader.readAsArrayBuffer(file);
+        document.getElementById("spriteFile").value = "";
+      }
+      function createFrameFromBuffer(arr){
+        let result = new Array(spriteHeight * PIXELS_PER_SIDE);
+        let index = 0;
+        for(var i = 0; i < result.length; i++){
+          result[i] = new Array(spriteWidth * PIXELS_PER_SIDE);
+          for(var j = 0; j < result[i].length; j++)
+            result[i][j] = arr[index++];
+        }
+        return createFrame(result);
+      }
+
+      let playing = false;
+      function playOrPause(){
+        if(!playing)
+          play();
+        else
+          playing = false;
+      }
+      async function play(){
+        playing = true;
+
+        while(playing){
+          drawCanvas();
+          await sleep(parseInt(document.getElementById("timePerFrame").value));
+          changeFrame((frame + 1) % frames.length);
+        }
+      }
+      function sleep(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+      function changeFrame(index){
+        let cfp = getCurrentFramePreview();
+        if(cfp)
+          cfp.setAttribute('class', 'frame-preview');
+
+        if(index == -1)
+          frame = frames.length - 1;
+        else
+          frame = Math.abs(index % frames.length);
+        document.getElementById("tempModeBox").checked = false;
+        updateTempMode();
+
+        let preview = getCurrentFramePreview();
+        if(preview)
+          preview.setAttribute('class', 'frame-preview-selected');
+        drawCanvas();
+      }
+      function swapFrames(){
+        let left = parseInt(document.getElementById("swapLeft").value);
+        let right = parseInt(document.getElementById("swapRight").value);
+
+        if(isNaN(left) || isNaN(right) || left === right)
+          return;
+
+        let leftGreater = left > right;
+        let min = Math.min(left, right), max = Math.max(left, right);
+        if(min < 0 || max < 0 || min >= frames.length || max >= frames.length){
+          alert('One or more of the given frame indices is invalid.');
+          return;
+        }
+
+        let [temp] = frames.splice((leftGreater ? max : min), 1);
+        frames.splice((leftGreater ? min + 1 : max), 0, temp);
+
+        updateFramePreviews();
+        if(left === frame || right === frame)
+          drawCanvas();
+      }
+      function getCurrentFramePreview(){
+        return document.getElementById("frames").childNodes[frame];
+      }
+      function updateCurrentFramePreview(){
+        let preview = getCurrentFramePreview();
+        if(!preview)
+          return;
+
+        preview.style.width = (PREVIEW_SCALE * spriteWidth) + "px";
+        preview.style.height = (PREVIEW_SCALE * spriteHeight) + "px";
+        preview.id = "preview" + frame;
+
+        let temp = drawGrid;
+        drawGrid = false;
+        drawCanvas();
+        preview.src = c.toDataURL();
+        drawGrid = temp;
+        drawCanvas();
+      }
+      function updateFramePreviews(){
+        let temp = frame;
+        for(var i = 0; i < frames.length; i++){
+          frame = i;
+          updateCurrentFramePreview();
+        }
+        frame = temp;
+      }
+      function addFrame(f){
+        frames.splice(f ? frames.length : frame, 0, f ? f : copyCurrentFrame());
+        addFramePreview((frames.length === 1 ? 0 : frame + 1));
+        if(tempMode){
+          document.getElementById("tempModeBox").checked = false;
+          updateTempMode();
+        }
+        changeFrame(frame + 1);
+        updateFramePreviews();
+      }
+      function addFramePreview(n){
+        let preview = document.createElement("input");
+        preview.setAttribute('type', 'image');
+        preview.setAttribute('src', c.toDataURL());
+        preview.setAttribute('class', 'frame-preview');
+        preview.setAttribute('id', 'preview' + n);
+        preview.style.width = (PREVIEW_SCALE * spriteWidth) + "px";
+        preview.style.height = (PREVIEW_SCALE * spriteHeight) + "px";
+        preview.onclick = () => {
+          let arr = Array.prototype.slice.call(document.getElementById("frames").childNodes);
+          changeFrame(arr.indexOf(preview));
+        }
+        document.getElementById("frames").appendChild(preview);
+      }
+      function deleteFrame(){
+        if(frames.length === 1){
+          alert("You must have at least 1 frame!");
+          return;
+        }
+        if(playing)
+          playing = false;
+        deleteFramePreview();
+        frames.splice(frame, 1);
+        changeFrame(frame);
+        updateFramePreviews();
+      }
+      function deleteFramePreview(){
+        document.getElementById('preview' + frame).remove();
+      }
+      function currentFrame(){
+        return frames[frame];
+      }
+      function copyCurrentFrame(){
+        let pixelGrid = currentFrame().pixelGrid;
+        let undoStack = currentFrame().undoStack;
+        let redoStack = currentFrame().redoStack;
+
+        let pg = new Array(pixelGrid.length);
+        for(var i = 0; i < pg.length; i++){
+          pg[i] = new Array(pixelGrid[i].length);
+          for(var j = 0; j < pg[i].length; j++)
+            pg[i][j] = pixelGrid[i][j];
+        }
+
+        let us = new Array(undoStack.length);
+        for(var i = 0; i < us.length; i++)
+          us[i] = undoStack[i];
+
+        let rs = new Array(redoStack.length);
+        for(var i = 0; i < rs.length; i++)
+          rs[i] = redoStack[i];
+
+        return { pixelGrid: pg, undoStack: us, redoStack: rs };
+      }
+      function createFrame(pg){
+        return { pixelGrid: pg, undoStack: [], redoStack: [] };
+      }
+      function pixelGridEqual(arr){
+        let pixelGrid = currentFrame().pixelGrid;
+        if(arr.length != pixelGrid.length)
+          return false;
+        for(var i = 0; i < arr.length; i++){
+          if(arr[i].length != pixelGrid[i].length)
+            return false;
+          for(var j = 0; j < arr[i].length; j++){
+            if(arr[i][j] != pixelGrid[i][j])
+              return false;
+          }
+        }
+        return true;
+      }
+      function pixelGridCopy(){
+        let pixelGrid = currentFrame().pixelGrid;
+        let temp = new Array(pixelGrid.length);
+        for(var i = 0; i < temp.length; i++){
+          temp[i] = new Array(pixelGrid[i].length);
+          for(var j = 0; j < temp[i].length; j++)
+            temp[i][j] = pixelGrid[i][j];
+        }
+        return temp;
+      }
+      function changeColor(index){  //switch current color index to given color index
+        if(index === COLOR_CLEAR)
+          return;
+        if(index < 0 || index > 0xF){
+          console.log(`Invalid color index ${index}. Must be between 0 and 0xF.`);
+          return;
+        }
+
+        document.getElementById(currentColor.toString(16).toUpperCase()).style.border = UNSELECTED_BORDER_STYLE;
+        currentColor = index;
+        document.getElementById(currentColor.toString(16).toUpperCase()).style.border = SELECTED_BORDER_STYLE;
+      }
+      function colorHex(c){ //return hex string of color
+        if(c === COLOR_CLEAR)
+          return '#00000000';
+
+        let s = c.toString(16);
+        while(s.length < 6)
+          s = '0' + s;
+        return '#' + s;
+      }
+      function inverseColorHex(c){
+        let r = c & 0xff0000;
+        let g = c & 0x00ff00;
+        let b = c & 0x0000ff;
+
+        let ic = (0xff0000 - r) |
+                 (0x00ff00 - g) |
+                 (0x0000ff - b);
+        return colorHex(ic);
+      }
+      function currentColorHex(){ //return hex string of current color
+        return colorHex(currentPalette[currentColor]);
+      }
+      function updateSpriteWidth(){ //get value from textbox
+        let temp = parseInt(document.getElementById("spriteWidth").value);
+        let result = true;
+
+        if(currentFrame()){
+          let pixelGrid = currentFrame().pixelGrid;
+
+          if(temp < spriteWidth){
+            let found = false;
+            for(var x = spriteWidth * PIXELS_PER_SIDE - 1; !found && x > temp * PIXELS_PER_SIDE; x--){
+              for(var y = 0; !found && y < pixelGrid.length; y++){
+                if(pixelGrid[y][x] != COLOR_CLEAR){
+                  found = true;
+                  result = confirm('Pixels you have drawn outside of the new canvas will not be saved. Continue?');
+                }
+              }
+            }
+          }
+        }
+
+        if(result){
+          spriteWidth = temp;
+          resizeCanvas();
+          resizePixelGrid();
+        }
+        else {
+          document.getElementById("spriteWidth").value = spriteWidth;
+        }
+        updateFramePreviews();
+      }
+      function updateSpriteHeight(){  //get value from textbox
+        let temp = parseInt(document.getElementById("spriteHeight").value);
+        let result = true;
+
+        if(currentFrame()){
+          let pixelGrid = currentFrame().pixelGrid;
+
+          if(temp < spriteHeight){
+            let found = false;
+            for(var y = spriteHeight * PIXELS_PER_SIDE - 1; !found && y > temp * PIXELS_PER_SIDE; y--)
+              for(var x = 0; !found && x < pixelGrid[y].length; x++)
+                if(pixelGrid[y][x] != COLOR_CLEAR){
+                  found = true;
+                  result = confirm('Pixels you have drawn outside of the new canvas will not be saved. Continue?');
+                }
+          }
+        }
+
+        if(result){
+          spriteHeight = temp;
+          resizeCanvas();
+          resizePixelGrid();
+        }
+        else {
+          document.getElementById("spriteHeight").value = spriteHeight;
+        }
+        updateFramePreviews();
+      }
+      function updatePixelSize(){ //get value from textbox
+        pixelSize = parseInt(document.getElementById("pixelSize").value);
+        resizeCanvas();
+      }
+      function loadPalette(e){
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let data = new Uint8Array(e.target.result);
+          let index = 0;
+
+          let nameLength = data[index++];
+          let nameBuffer = [];
+          for(var i = 0; i < nameLength; i++)
+            nameBuffer.push(data[index++]);
+          let name = String.fromCharCode(...nameBuffer);
+
+          let temp = [];
+          for(var i = 0; i < 16; i++){
+            let cur = 0;
+            cur |= (data[index++] << 16);
+            cur |= (data[index++] << 8);
+            cur |= data[index++];
+            temp.push(cur);
+          }
+          palettes[name] = temp;
+          let option = document.createElement("option");
+          option.value = name;
+          option.innerHTML = name;
+          document.getElementById("palette").appendChild(option);
+          document.getElementById("palette").value = name;
+
+          updatePalette();
+        };
+        reader.readAsArrayBuffer(file);
+        document.getElementById("paletteFile").value = "";
+      }
+      function updatePalette(){
+        currentPalette = palettes[document.getElementById("palette").value];
+        drawCanvas();
+
+        for(var i = 0; i < 0x10; i++){
+          let button = document.getElementById(""+i.toString(16).toUpperCase());
+          button.style.color = inverseColorHex(currentPalette[i]);
+          button.style.backgroundColor = colorHex(currentPalette[i]);
+        }
+      }
+      function resizeCanvas(){  //change canvas according to pixelSize
+        c.width = pixelSize * PIXELS_PER_SIDE * spriteWidth;
+        c.height = pixelSize * PIXELS_PER_SIDE * spriteHeight;
+
+        for(var i = pixelSize; i < c.width; i += pixelSize){
+          let color = (mirrorX && i === c.width / 2 ? "#ff0000" : "#000000");
+          line(i, 0, i, c.height, color);
+        }
+        for(var i = pixelSize; i < c.height; i += pixelSize){
+          let color = (mirrorY && i === c.height / 2 ? "#ff0000" : "#000000");
+          line(0, i, c.width, i, color);
+        }
+        grid.src = c.toDataURL();
+        grid.onload = () => {
+          drawCanvas();
+        }
+      }
+      function resizePixelGrid(){ //change grid according to spriteHeight/Width
+        for(var j = 0; j < frames.length; j++){
+          let pixelGrid = frames[j].pixelGrid;
+          let temp = new Array(spriteHeight * PIXELS_PER_SIDE);
+          for(var i = 0; i < temp.length; i++){
+            temp[i] = new Array(spriteWidth * PIXELS_PER_SIDE);
+            temp[i].fill(COLOR_CLEAR);
+          }
+          let xmin = Math.min(spriteWidth * PIXELS_PER_SIDE, frames[j].pixelGrid[0].length);
+          let ymin = Math.min(spriteHeight * PIXELS_PER_SIDE, frames[j].pixelGrid.length);
+          for(var i = 0; i < ymin; i++)
+            for(var k = 0; k < xmin; k++)
+              temp[i][k] = frames[j].pixelGrid[i][k];
+          frames[j].pixelGrid = temp;
+
+          let undoStack = frames[j].undoStack;
+          for(var l = 0; l < undoStack.length; l++){
+            let us = undoStack[l];
+            temp = new Array(spriteHeight * PIXELS_PER_SIDE);
+            for(var i = 0; i < temp.length; i++){
+              temp[i] = new Array(spriteWidth * PIXELS_PER_SIDE);
+              temp[i].fill(COLOR_CLEAR);
+            }
+            xmin = Math.min(spriteWidth * PIXELS_PER_SIDE, us[0].length);
+            ymin = Math.min(spriteHeight * PIXELS_PER_SIDE, us.length);
+            for(var i = 0; i < ymin; i++)
+              for(var k = 0; k < xmin; k++)
+                temp[i][k] = us[i][k];
+            undoStack[l] = temp;
+          }
+        }
+        clearTempLayer();
+        drawCanvas();
+      }
+      function printPixelGrid(){  //print sprite code to console
+          let extraTab = (frames.length === 1 ? '' : '\t');
+
+          let frameList = "";
+          for(var i = 0; i < frames.length; i++){
+            let pixelGrid = frames[i].pixelGrid;
+            let pixelGridString = "\n";
+            for(var y = 0; y < pixelGrid.length; y++){
+              pixelGridString += '\t' + extraTab;
+              for(var x = 0; x < pixelGrid[y].length; x++){
+                let cur = pixelGrid[y][x];
+                pixelGridString += (cur < 10 ? " " + cur : cur);
+                if(y != pixelGrid.length - 1 || x != pixelGrid[y].length - 1)
+                  pixelGridString += ",";
+              }
+              pixelGridString += "\n";
+            };
+            frameList += `${extraTab}(short[]){${pixelGridString}\t}${i !== frames.length - 1 ? ",\n" : "\n"}`;
+          }
+
+          let spriteName = document.getElementById("spriteName").value;
+          let paletteName = "";
+          Object.keys(palettes).forEach((k) => {
+            let p = palettes[k];
+            for(var i = 0; i < p.length; i++)
+              if(p[i] != currentPalette[i])
+                return;
+            paletteName = "&Palettes::" + k.toLowerCase();
+          });
+
+          let s;
+          if(frames.length === 1)
+            s = `const Sprite ${spriteName} = Sprite(${paletteName}, ${frameList.substring(0, frameList.length - 1)}, ${spriteWidth}, ${spriteHeight});`;
+          else{
+            s = `const MultiSprite ${spriteName} = MultiSprite(${paletteName}, (short*[]){\n ${frameList}}, ${spriteWidth}, ${spriteHeight}, ${frames.length});`;
+            s += ` // ms per frame: ${document.getElementById("timePerFrame").value}`
+          }
+          console.log(s);
+      }
+      function clearPixelGrid(){
+        if(!confirm('Erase the canvas?'))
+          return;
+
+        let pixelGrid = currentFrame().pixelGrid;
+        for(var i = 0; i < pixelGrid.length; i++)
+          for(var j = 0; j < pixelGrid[i].length; j++)
+            pixelGrid[i][j] = COLOR_CLEAR;
+      }
+      function load(e){
+        if(!confirm('WARNING: Any unsaved progress on the current sprite will be lost. Load anyway?'))
+          return;
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let data = new Uint8Array(e.target.result);
+          let index = 0;
+
+          let width = data[index++];
+          let height = data[index++];
+          let nframes = data[index++];
+          document.getElementById("timePerFrame").value = (data[index++] << 8) | data[index++];
+
+          let paletteNameSize = data[index++];
+          let paletteNameBuffer = [];
+          for(var i = 0; i < paletteNameSize; i++)
+            paletteNameBuffer.push(data[index++]);
+          let paletteName = String.fromCharCode(...paletteNameBuffer);
+          if(!palettes[paletteName]){
+            alert(`Must load palette "${paletteName}" before loading this sprite.`);
+            return;
+          }
+
+          let spriteNameSize = data[index++];
+          let spriteNameBuffer = [];
+          for(var i = 0; i < spriteNameSize; i++)
+            spriteNameBuffer.push(data[index++]);
+          document.getElementById("spriteName").value = String.fromCharCode(...spriteNameBuffer);
+
+          document.getElementById("spriteWidth").value = width;
+          document.getElementById("spriteHeight").value = height;
+          updateSpriteWidth();
+          updateSpriteHeight();
+
+          frames = [];
+          frame = 0;
+          document.getElementById("frames").innerHTML = '';
+          for(var i = 0; i < nframes; i++){
+            let grid = [];
+            for(var j = 0; j < spriteHeight * PIXELS_PER_SIDE; j++)
+              for(var k = 0; k < spriteWidth * PIXELS_PER_SIDE; k++)
+                grid.push(data[index++]);
+            addFrame(createFrameFromBuffer(grid));
+          }
+
+          document.getElementById("palette").value = paletteName;
+          document.getElementById("spriteFile").value = "";
+          updatePalette();
+        };
+        reader.readAsArrayBuffer(file);
+        document.getElementById("spriteFileLegacy").value = "";
+      }
+      function createFrameFromText(text, w, h){
+        let values = text.trim().split(',');
+
+        w = w * PIXELS_PER_SIDE;
+        h = h * PIXELS_PER_SIDE;
+
+        let pg = new Array(h);
+        for(var i = 0; i < h; i++){
+          pg[i] = new Array(w);
+          for(var j = 0; j < w; j++)
+            pg[i][j] = parseInt(values[i * w + j]);
+        }
+        return { pixelGrid: pg, undoStack: [], redoStack: [] };
+      }
+      function shiftPixelGrid(dx, dy){
+        let pixelGrid = (tempMode ? tempLayer: currentFrame().pixelGrid);
+
+        for(var i = 0; i < Math.abs(dy); i++){
+          for(var j = (dy < 0 ? 0 : pixelGrid.length - 1); (dy < 0 ? j < pixelGrid.length - 1 : j > 0); j -= Math.sign(dy))
+            pixelGrid[j] = pixelGrid[j - Math.sign(dy)];
+          pixelGrid[(dy < 0 ? pixelGrid.length - 1 : 0)] = new Array(pixelGrid[0].length).fill(COLOR_CLEAR);
+        }
+        for(var x = 0; x < Math.abs(dx); x++){
+          for(var i = 0; i < pixelGrid.length; i++){
+            for(var j = (dx < 0 ? 0 : pixelGrid[i].length - 1); (dx < 0 ? j < pixelGrid[i].length - 1 : j > 0); j -= Math.sign(dx))
+              pixelGrid[i][j] = pixelGrid[i][j - Math.sign(dx)];
+            pixelGrid[i][(dx < 0 ? pixelGrid[i].length - 1 : 0)] = COLOR_CLEAR;
+          }
+        }
+        drawCanvas();
+        updateCurrentFramePreview();
+      }
+
+      function toggleGrid(){
+        drawGrid = !drawGrid;
+        drawCanvas();
+      }
+      function toggleMirror(y){
+        if(y)
+          mirrorY = !mirrorY;
+        else
+          mirrorX = !mirrorX;
+        resizeCanvas();
+        drawCanvas();
+      }
+      function clearScreen(){
+        clearRect(0, 0, c.width, c.height);
+      }
+      function clearRect(x, y, w, h){
+        ctx.clearRect(x, y, w, h);
+        rect(x, y, w, h, bgcolor);
+      }
+      function rect(x, y, w, h, c, a = 1){
+        ctx.globalAlpha = a;
+        ctx.fillStyle = c;
+        ctx.fillRect(x, y, w, h);
+      }
+      function line(x1, y1, x2, y2, c){
+        ctx.strokeStyle = c;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.closePath();
+      }
+      function drawPixel(x, y, fromTempLayer){
+        let pixelGrid = currentFrame().pixelGrid;
+        let index = (fromTempLayer ? tempLayer[y][x] : pixelGrid[y][x]);
+        if(index === COLOR_CLEAR)
+          clearRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        else {
+          let color = colorHex(currentPalette[index]);
+          rect(x * pixelSize, y * pixelSize, pixelSize, pixelSize, color);
+        }
+      }
+      function floodFill(x, y, c){
+        let pixelGrid = currentFrame().pixelGrid;
+        if(y < 0 || y > pixelGrid.length - 1 ||
+          x < 0 || x > pixelGrid[y].length - 1 ||
+          pixelGrid[y][x] !== c || pixelGrid[y][x] === currentColor)
+          return;
+        setPixel(x, y, currentColor);
+        floodFill(x - 1, y, c);
+        floodFill(x, y - 1, c);
+        floodFill(x + 1, y, c);
+        floodFill(x, y + 1, c);
+      }
+      function drawPixelGrid(){
+        let cur = currentFrame();
+        if(!cur)
+          return;
+        let pixelGrid = cur.pixelGrid;
+        for(var y = 0; y < pixelGrid.length; y++)
+          for(var x = 0; x < pixelGrid[y].length; x++)
+            if(!selectedPixels.some((p) => p.x === x && p.y === y) || (tempMode && selecting))
+              drawPixel(x, y);
+      }
+      function drawCanvas(){
+        clearScreen();
+        drawPixelGrid();
+        if(tempMode)
+          drawTempLayer();
+        if(drawGrid){
+          ctx.globalAlpha = 1;
+          ctx.drawImage(grid, 0, 0);
+        }
+      }
+      function setPixel(x, y, c){
+        let pixelGrid = currentFrame().pixelGrid;
+        let undoStack = currentFrame().undoStack;
+
+        if(!tempMode){
+          currentFrame().redoStack = [];
+          if(undoStack.length === 0 || !pixelGridEqual(undoStack[undoStack.length - 1]))
+            undoStack.push(pixelGridCopy());
+          pixelGrid[y][x] = c;
+          if(mirrorX)
+            pixelGrid[y][pixelGrid[y].length - 1 - x] = c;
+          if(mirrorY)
+            pixelGrid[pixelGrid.length - 1 - y][x] = c;
+          if(mirrorX && mirrorY)
+            pixelGrid[pixelGrid.length - 1 - y][pixelGrid[y].length - 1 - x] = c;
+        }
+        else {
+          tempLayer[y][x] = pixelGrid[y][x];
+          if(!selectedPixels.some((p) => p.x === x && p.y === y))
+            selectedPixels.push({ x, y });
+        }
+      }
+      function updateCanvas(){  //use mouse input to draw on canvas
+        let pixelGrid = currentFrame().pixelGrid;
+        let crect = c.getBoundingClientRect();
+        let updated = false;
+
+        let px = parseInt(mouse.x / pixelSize);
+        let py = parseInt(mouse.y / pixelSize);
+        if(py >= 0 && py < pixelGrid.length && px >= 0 && px < pixelGrid[py].length){
+          if(mouse.button === LMB){
+            if(tempMode || pixelGrid[py][px] != currentColor)
+            {
+              setPixel(px, py, currentColor);
+              updated = true;
+            }
+          }
+          else if(mouse.button === RMB){
+            if(tempMode || pixelGrid[py][px] != COLOR_CLEAR)
+            {
+              setPixel(px, py, COLOR_CLEAR);
+              updated = true;
+            }
+          }
+          else if(mouse.button === MMB){
+            floodFill(px, py, pixelGrid[py][px]);
+            updated = true;
+          }
+        }
+        if(updated)
+          drawCanvas();
+      }
+      function updateBackgroundColor(){
+        bgcolor = document.getElementById("backgroundColor").value;
+        updateFramePreviews();
+      }
+
+      window.onmousemove = (e) => {
+        let crect = c.getBoundingClientRect();
+        mouse.x = e.clientX - crect.x;
+        mouse.y = e.clientY - crect.y;
+
+        if(mouse.x < 0 || mouse.x > crect.width || mouse.y < 0 || mouse.y > crect.height)
+          mouse.button = -1;
+        else {  //account for when mouse is pressed, dragged off canvas, then dragged back on
+          //e.buttons = 0b[MMB][RMB][LMB]
+          //console.log(e.buttons.toString(2));
+          if(e.buttons & 0b1)
+            mouse.button = 0;
+          else if(e.buttons & 0b10)
+            mouse.button = 2;
+          else if(e.buttons & 0b100)
+            mouse.button = 1;
+        }
+
+        updateCanvas();
+      }
+      window.onmousedown = (e) => {
+        // scroll wheel press; will scroll page
+        if(e.button == 1)
+          e.preventDefault();
+        mouse.button = e.button;
+        updateCanvas();
+      }
+      window.onmouseup = (e) => {
+        mouse.button = -1;
+        updateCurrentFramePreview();
+      }
+      window.oncontextmenu = (e) => {
+        e.preventDefault();
+      }
+      window.onkeydown = (e) => {
+        let key = e.keyCode;
+        if(document.activeElement.nodeName === 'INPUT' && document.activeElement.getAttribute("type") === 'text')
+          return;
+
+        if(key >= 48 && key <= 48 + 9)  //0-9
+          changeColor(key - 48);
+        else if(key >= 65 && key <= 65 + 5) //A-F
+          changeColor(10 + (key - 65));
+        else if(key === 71){   //G
+          toggleGrid();
+          document.getElementById("grid").checked = drawGrid;
+        }
+        else if(key === 32){  // space
+          document.getElementById("tempModeBox").checked = !tempMode;
+          updateTempMode();
+        }
+        else if(key === 188){ //,
+          toggleMirror(false);
+          document.getElementById("mirrorx").checked = mirrorX;
+        }
+        else if(key === 190){ //.
+          toggleMirror(true);
+          document.getElementById("mirrory").checked = mirrorY;
+        }
+        else if(key === 90){  //z
+          let undoStack = currentFrame().undoStack;
+          let redoStack = currentFrame().redoStack;
+          if(undoStack.length > 0){
+            redoStack.push(pixelGridCopy());
+            let state;
+            while(pixelGridEqual(state = undoStack.pop()));
+            currentFrame().pixelGrid = state;
+            drawCanvas();
+          }
+        }
+        else if(key === 89){  //y
+          let undoStack = currentFrame().undoStack;
+          let redoStack = currentFrame().redoStack;
+          if(redoStack.length > 0){
+            undoStack.push(pixelGridCopy());
+            let state = redoStack.pop();
+            currentFrame().pixelGrid = state;
+            drawCanvas();
+          }
+        }
+        else if(key === 17) { //ctrl
+          let pixelGrid = currentFrame().pixelGrid;
+          let px = parseInt(mouse.x / pixelSize);
+          let py = parseInt(mouse.y / pixelSize);
+          if(py >= 0 && py < spriteHeight * PIXELS_PER_SIDE && px >= 0 && px < spriteWidth * PIXELS_PER_SIDE)
+            changeColor(pixelGrid[py][px]);
+        }
+        else if(key >= 37 && key <= 40){  // arrow keys
+          if(tempMode)
+            selecting = false;
+          shiftPixelGrid((key % 2 == 0 ? 0 : key - 38), (key % 2 == 1 ? 0 : key - 39));
+        }
+        else if(key == 81) // Q
+          changeFrame(frame - 1);
+        else if(key == 87) // W
+          changeFrame(frame + 1);
+      }
+    </script>
+  </body>
+</html>
