@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      * {
+        font-family: 'Courier New';
+        color: #ededed;
+        background: #555555;
+      }
+    </style>
+    <title>Palette Creator</title>
+  </head>
+  <body>
+    <label for = "paletteName">Palette name: </label>
+    <input type = "text" id = "paletteName" value = "newPalette" style = "width: 545px;"></input>
+    <button onclick = "save();">Save</button>
+    <button onclick = "load();">Legacy Load</button>
+    <label for = "file-input">Load File:</label>
+    <input type = "file" id = "file-input"></input>
+
+    <br><br>
+
+    <input type = "color" id = "color" onchange = "updateColorFromPicker();"></input>
+    <label for = "color" id = "colorLabel">Current color:</label>
+    <input type = "text" id = "colorText" value = "000000" onchange = "updateColorFromText();"></input>
+    <button onclick = "copyToNextEmpty();">Copy to next empty</button>
+    <button onclick = "drawTints();">Tint</button>
+    <button onclick = "drawShades();">Shade</button>
+    <br><br>
+
+    <canvas id = "ts" style = "border: solid 1px black;"></canvas>
+    <br><br>
+
+    <label for = "c">Palette:</label>
+    <br>
+    <canvas id = "c" style = "border: solid 1px black;"></canvas>
+
+    <br><br>
+
+    <div onchange = "updateCanvas();">
+      <label for = "palette0">0:</label>
+      <input type = "text" id = "palette0"></input>
+      <label for = "palette1">1:</label>
+      <input type = "text" id = "palette1"></input>
+      <label for = "palette2">2:</label>
+      <input type = "text" id = "palette2"></input>
+      <label for = "palette3">3:</label>
+      <input type = "text" id = "palette3"></input>
+      <br>
+      <label for = "palette4">4:</label>
+      <input type = "text" id = "palette4"></input>
+      <label for = "palette5">5:</label>
+      <input type = "text" id = "palette5"></input>
+      <label for = "palette6">6:</label>
+      <input type = "text" id = "palette6"></input>
+      <label for = "palette7">7:</label>
+      <input type = "text" id = "palette7"></input>
+      <br>
+      <label for = "palette8">8:</label>
+      <input type = "text" id = "palette8"></input>
+      <label for = "palette9">9:</label>
+      <input type = "text" id = "palette9"></input>
+      <label for = "paletteA">A:</label>
+      <input type = "text" id = "paletteA"></input>
+      <label for = "paletteB">B:</label>
+      <input type = "text" id = "paletteB"></input>
+      <br>
+      <label for = "paletteC">C:</label>
+      <input type = "text" id = "paletteC"></input>
+      <label for = "paletteD">D:</label>
+      <input type = "text" id = "paletteD"></input>
+      <label for = "paletteE">E:</label>
+      <input type = "text" id = "paletteE"></input>
+      <label for = "paletteF">F:</label>
+      <input type = "text" id = "paletteF"></input>
+    </div>
+
+    <br><br>
+
+    <button id = "clear" onclick = "clearColors();">Clear Palette</button>
+    <script>
+
+      document.getElementById("file-input").addEventListener("change", loadFile, false);
+
+      let c = document.getElementById("c");
+      let ctx = c.getContext("2d");
+      let NUM_COLORS = 16;
+      c.width = 50 * NUM_COLORS;
+      c.height = 50;
+
+      let ts = document.getElementById("ts");
+      let tsctx = ts.getContext("2d");
+      ts.width = 50 * NUM_COLORS;
+      ts.height = 65;
+
+      let currentColor = 0;
+      let colors = new Array(NUM_COLORS);
+      updateCanvas();
+
+      let ibase = 0b11111111;
+      let ri = ibase << 16, gi = ibase << 8, bi = ibase;
+      function shade(color, factor){
+        let rc = color & ri, gc = color & gi, bc = color & bi;
+
+        let rn = Math.round(rc * (1 - factor)) & ri;
+        let gn = Math.round(gc * (1 - factor)) & gi;
+        let bn = Math.round(bc * (1 - factor)) & bi;
+
+        return rn | gn | bn;;
+      }
+      function tint(color, factor){
+        let rc = color & ri, gc = color & gi, bc = color & bi;
+
+        let rn = Math.round(rc + (ri - rc) * factor) & ri;
+        let gn = Math.round(gc + (gi - gc) * factor) & gi;
+        let bn = Math.round(bc + (bi - bc) * factor) & bi;
+
+        return rn | gn | bn;
+      }
+      function colorHex(c){ //return hex string of color
+        let s = c.toString(16);
+        while(s.length < 6)
+          s = '0' + s;
+        return '#' + s;
+      }
+      function rect(ctx, x, y, w, h, c){
+        ctx.fillStyle = c;
+        ctx.fillRect(x, y, w, h);
+      }
+      function updateColorFromPicker(){
+        // get rid of preceeding '#'
+        let input = document.getElementById("color").value.substring(1).toUpperCase();
+        document.getElementById("colorText").value = input;
+        currentColor = parseInt(input, 16);
+      }
+      function updateColorFromText(){
+        let input = document.getElementById("colorText").value.toUpperCase();
+        let value;
+        try {
+          value = parseInt(input, 16);
+        }
+        catch(e){
+          console.log("Invalid color code; must be in range 0x000000-0xFFFFFF");
+        }
+        document.getElementById("color").value = colorHex(value);
+        currentColor = value;
+      }
+      function updateCanvas(fromFile){
+        for(var i = 0; i < NUM_COLORS; i++){
+          if(!fromFile)
+            colors[i] = colorHex(getColor(i));
+          rect(ctx, i * 50, 0, 50, 50, colors[i]);
+        }
+      }
+      function clearColors(){
+        for(var i = 0; i < NUM_COLORS; i++){
+          let iformat = i.toString(16).toUpperCase();
+          let cur = document.getElementById("palette" + iformat);
+          cur.value = '';
+        }
+        updateCanvas();
+      }
+      function copyToNextEmpty(){
+        let i;
+        for(i = 0; i < NUM_COLORS; i++){
+          let iformat = i.toString(16).toUpperCase();
+          let cur = document.getElementById("palette" + iformat);
+          if(cur.value === ''){
+            cur.value = colorHex(currentColor).substring(1);
+            break;
+          }
+        }
+        // no empty spot
+        if(i === NUM_COLORS)
+          alert('There are no empty spaces. Color not copied.');
+        updateCanvas();
+      }
+
+      function getColor(i){
+        let iformat = i.toString(16).toUpperCase();
+        return parseInt(colorHex(document.getElementById("palette" + iformat).value).substring(1), 16);
+      }
+      function setColor(i, v){
+        let iformat = i.toString(16).toUpperCase();
+        document.getElementById("palette" + iformat).value = v;
+      }
+      function downloadFile(){
+        let name = document.getElementById("paletteName").value;
+        if(name.length > 255){
+          alert('Name length > 255 characters. Failed to save.');
+          return;
+        }
+
+        let index = 0;
+        let data = new Uint8Array(NUM_COLORS * 3 + (1 + name.length));
+        data[index++] = name.length;
+        for(var i = 0; i < name.length; i++)
+          data[index++] = name.charCodeAt(i);
+        for(var i = 0; i < NUM_COLORS; i++){
+          let cur = getColor(i);
+          data[index++] = (cur & (0b11111111 << 16)) >> 16;
+          data[index++] = (cur & (0b11111111 << 8)) >> 8;
+          data[index++] = cur & 0b11111111;
+        }
+        console.log(data);
+
+        let file = new Blob([data], { type: 'application/octet-stream' });
+
+        let a = document.createElement("a"), url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = `${document.getElementById("paletteName").value}.palette`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 0);
+      }
+      function loadFile(e){
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let data = new Uint8Array(e.target.result);
+          let index = 0;
+
+          let nameLength = data[index++];
+          let nameBuffer = [];
+          for(var i = 0; i < nameLength; i++)
+            nameBuffer.push(data[index++]);
+          let name = String.fromCharCode(...nameBuffer);
+
+          for(var i = 0; i < NUM_COLORS; i++){
+            let cur = 0;
+            cur |= (data[index++] << 16);
+            cur |= (data[index++] << 8);
+            cur |= data[index++];
+            colors[i] = colorHex(cur);
+            setColor(i, colors[i].substring(1));
+          }
+          updateCanvas(true);
+          document.getElementById("paletteName").value = name;
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      function save(){
+        downloadFile();
+        let name = document.getElementById("paletteName").value;
+
+        let js = `"${name}": [\n`;
+        let cpp = `const uint32_t* ${name} = (uint32_t[]){\n`;
+        for(var i = 0; i < 16; i++){
+          let value = colorHex(getColor(i)).substring(1);
+
+          let cur = `\t0x${value}${i == 15 ? '\n' : ',\n'}`;
+          if((i + 1) % 4 == 0 && i != 15)
+            cur += '\n';
+
+          js += cur;
+          cpp += cur;
+        }
+        console.log(js + ']');
+        console.log(cpp + '};');
+      }
+      function drawTints(){
+        tsctx.clearRect(0, 0, ts.width, ts.height);
+        for(var i = 0; i < 16; i++){
+          let cur = colorHex(tint(currentColor, i / 15));
+          rect(tsctx, i * 50, 0, 50, 50, cur);
+          drawText(cur.substring(1), i * 50 + 3, 60);
+        }
+      }
+      function drawShades(){
+        tsctx.clearRect(0, 0, ts.width, ts.height);
+        for(var i = 0; i < 16; i++){
+          let cur = colorHex(shade(currentColor, i / 15));
+          rect(tsctx, i * 50, 0, 50, 50, cur);
+          drawText(cur.substring(1), i * 50 + 3, 60);
+        }
+      }
+      function drawText(text, x, y){
+        tsctx.fillStyle = "#cccccc";
+        tsctx.font = '12px Courier New';
+        tsctx.fillText(text, x, y);
+      }
+      function load(){
+        let text = prompt('Enter palette in JavaScript format:');
+        if(text)
+          text = text.trim();
+        let name = text.substring(text.indexOf('"') + 1, text.indexOf('":'));
+        document.getElementById("paletteName").value = name;
+        let values = text.substring(text.indexOf('[') + 1, text.indexOf(']')).replace(/\s/g, '').replace(/0x/g, '').split(',');
+
+        for(var i = 0; i < NUM_COLORS; i++){
+          document.getElementById("palette" + i.toString(16).toUpperCase()).value = values[i];
+          colors[i] = parseInt(values[i], 16);
+        }
+        updateCanvas();
+      }
+    </script>
+  </body>
+</html>
